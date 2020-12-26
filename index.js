@@ -1,9 +1,25 @@
 import express from "express";
 import morgan from "morgan";
 import dotenv from "dotenv";
+import mongoose from "mongoose";
 
-import Routes from "./routes/routes.js";
+import AuthRoutes from "./routes/auth/auth.js";
+import TeamRoutes from "./routes/teams/team.js";
 dotenv.config();
+
+//Connect to db
+mongoose.connect(
+  process.env.DBCONNECTION,
+  {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  },
+  (error) => {
+    if (error) throw error;
+
+    console.log(`Database is connected`);
+  }
+);
 
 // Configs
 const app = express();
@@ -15,7 +31,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 
 // Routes
-app.use(Routes);
+app.use("/api/auth", AuthRoutes);
+app.use("/api", TeamRoutes);
 
 // Server
 app.listen(port, () => {
