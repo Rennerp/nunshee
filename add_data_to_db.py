@@ -51,7 +51,7 @@ for indice, equipo in enumerate(document.findall("equipo")):
         "jugadores": {'cant': equipo.find('jugadores').attrib['cant'], 'jugador': []},
         "jugadoresDadosBaja": {'cant': equipo.find('jugadoresDadosBaja').attrib['cant'], 'jugador': []}
     }]
-    jugadores = equipo.find('jugadores').findall('jugador') 
+    jugadores = equipo.find('jugadores').findall('jugador')
     jugadoresDadosBaja = equipo.find('jugadoresDadosBaja').findall('jugador')
     for i, jugador in enumerate(jugadores):
         equipos[indice]["jugadores"]["jugador"] += [{
@@ -106,11 +106,15 @@ for indice, equipo in enumerate(document.findall("equipo")):
             'localidad': jugadorDeBaja.find('localidad').text,
         }]
 
-plantel_equipo["equipos"] = equipos
 # Conexión al cluster
 cliente = MongoClient(DBCONNECTION)
 db = cliente["plantelEquipo"]
-collection = db["plantelEquipo"]
+# equipos_ingresados = db["equipos"].insert_many(equipos)
+# plantel_equipo["equipos"] = equipos_ingresados.inserted_ids
+# db["plantelEquipo"].insert_one(plantel_equipo)
 
 # Insertamos
+plantel_equipo["equipos"] = equipos
+collection = db["plantelEquipo"]
 collection.insert_one(plantel_equipo)
+
