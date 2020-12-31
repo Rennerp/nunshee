@@ -42,20 +42,20 @@ plantel_equipo["fechaActual"] = {
 equipos = []
 for indice, equipo in enumerate(document.findall("equipo")):
     equipos += [{
-        "_id": equipo.attrib["id"],
+        "equipo_id": equipo.attrib["id"],
         "nombre": equipo.attrib["nombre"],
         "sigla": equipo.attrib["sigla"],
         "paisId": equipo.attrib["paisId"],
         "paisNombre": equipo.attrib["paisNombre"],
         "tipo": equipo.attrib["tipo"],
-        "jugadores": {'cant': equipo.find('jugadores').attrib['cant'], 'jugador': []},
-        "jugadoresDadosBaja": {'cant': equipo.find('jugadoresDadosBaja').attrib['cant'], 'jugador': []}
+        "jugadores": [],
+        "jugadoresDadosBaja": []
     }]
     jugadores = equipo.find('jugadores').findall('jugador')
     jugadoresDadosBaja = equipo.find('jugadoresDadosBaja').findall('jugador')
     for i, jugador in enumerate(jugadores):
-        equipos[indice]["jugadores"]["jugador"] += [{
-            "_id": jugador.attrib['id'],
+        equipos[indice]["jugadores"] += [{
+            "jugador_id": jugador.attrib['id'],
             'nombre': jugador.find('nombre').text,
             'apellido': jugador.find('apellido').text,
             'nombreCorto': jugador.find('nombreCorto').text,
@@ -80,8 +80,8 @@ for indice, equipo in enumerate(document.findall("equipo")):
             'localidad': jugador.find('localidad').text,
         }]
     for j, jugadorDeBaja in enumerate(jugadoresDadosBaja):
-        equipos[indice]["jugadoresDadosBaja"]["jugador"] += [{
-            "_id": jugadorDeBaja.attrib['id'],
+        equipos[indice]["jugadoresDadosBaja"] += [{
+            "jugador_id": jugadorDeBaja.attrib['id'],
             'nombre': jugadorDeBaja.find('nombre').text,
             'apellido': jugadorDeBaja.find('apellido').text,
             'nombreCorto': jugadorDeBaja.find('nombreCorto').text,
@@ -109,12 +109,12 @@ for indice, equipo in enumerate(document.findall("equipo")):
 # Conexión al cluster
 cliente = MongoClient(DBCONNECTION)
 db = cliente["plantelEquipo"]
-# equipos_ingresados = db["equipos"].insert_many(equipos)
-# plantel_equipo["equipos"] = equipos_ingresados.inserted_ids
-# db["plantelEquipo"].insert_one(plantel_equipo)
+equipos_ingresados = db["equipos"].insert_many(equipos)
+plantel_equipo["equipos"] = equipos_ingresados.inserted_ids
+db["plantelEquipo"].insert_one(plantel_equipo)
 
 # Insertamos
-plantel_equipo["equipos"] = equipos
-collection = db["plantelEquipo"]
-collection.insert_one(plantel_equipo)
+# plantel_equipo["equipos"] = equipos
+# collection = db["plantelEquipo"]
+# collection.insert_one(plantel_equipo)
 

@@ -1,26 +1,46 @@
-import { response, Router } from "express";
+import { Router } from "express";
 import { verifyAuth } from "../verifyAuth.js";
-import plantelEquipo from "../../model/PlantelEquipo.js";
+import Equipo from "../../model/Equipo.js";
 
 const router = Router();
 
-router.get("/team", verifyAuth, (_, res) => {
+router.get("/", verifyAuth, (_, res) => {
   // Obtener todos los equipos
-  plantelEquipo.find({}, "equipos", function (error, plantelEquipo) {
-    if (error) return next(error);
-    res.send(plantelEquipo[0]);
-  });
+  Equipo.find(
+    {},
+    "nombre sigla paisId paisNombre Tipo",
+    function (error, equipo) {
+      if (error) return next(error);
+      res.send({ equipos: equipo });
+    }
+  );
 });
 
-router.get("/team/:idTeam/players", verifyAuth, (req, res) => {
+router.get("/:idTeam/players", verifyAuth, (req, res) => {
   let idTeam = req.params.idTeam;
 
-  plantelEquipo.find(
-    {},
-    { equipos: { $elemMatch: { _id: idTeam } }, _id: false },
-    function (error, plantelEquipo) {
+  Equipo.find(
+    { equipo_id: idTeam },
+    "jugadores jugadoresDadosBaja",
+    function (error, jugadores) {
       if (error) return next(error);
-      let jugadores = plantelEquipo[0].equipos[0].jugadores;
+      res.send(jugadores);
+    }
+  );
+});
+
+router.get("/players/:position", verifyAuth, (req, res, next) => {
+  let position = req.params.position;
+  Equipo.find(
+    { "jugadores.rol.rol": position },
+    {
+      jugadores: { $elemMatch: { "rol.rol": position } },
+      equipo_id: true,
+      nombre: true,
+      _id: false,
+    },
+    function (error, jugadores) {
+      if (error) return next(error);
       res.send(jugadores);
     }
   );

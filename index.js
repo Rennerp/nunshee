@@ -20,7 +20,7 @@ app.use(express.urlencoded({ extended: false }));
 
 // Routes
 app.use("/api/auth", AuthRoutes);
-app.use("/api", TeamRoutes);
+app.use("/api/team", TeamRoutes);
 
 // Server
 app.listen(port, () => {

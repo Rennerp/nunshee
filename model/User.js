@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import bcrypt from "bcryptjs";
 
 const userSchema = new mongoose.Schema({
   name: {
@@ -24,4 +25,16 @@ const userSchema = new mongoose.Schema({
   },
 });
 
-export default mongoose.model("User", userSchema);
+// Encrypt the password
+userSchema.statics.encryptPassword = async (password) => {
+  const salt = await bcrypt.genSalt(10);
+  const hashPassword = await bcrypt.hash(password, salt);
+  return hashPassword;
+};
+
+userSchema.comparePassword = async (receivedPassword, password) => {
+  return await bcrypt.compare(receivedPassword, password);
+};
+
+const User = mongoose.model("User", userSchema);
+export default User;
